@@ -1,5 +1,7 @@
+.codegraph
 .DS_Store
 Thumbs.db
 *.swp
 *.swo
 *~
+colors/singularity-dev.lua

@@ -173,11 +173,6 @@
   "infer" @keyword.operator.infer
   (type_identifier) @type.inferred)
 
-; --- Type Assertion: <Type>expr (TS-only, nicht TSX) ---
-(type_assertion
-  (type_arguments
-    (type_identifier) @type.assertion))
-
 ; --- As Expression: expr as Type ---
 (as_expression
   "as" @keyword.operator.as

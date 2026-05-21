@@ -20,6 +20,12 @@ function M.setup()
 	hl(0, "GroupsSep",      { fg = c.bg,        bg = c.bg_dark })
 	-- Trailing fill of the winbar.
 	hl(0, "GroupsFill",     { bg = c.bg_dark })
+	-- border_char accent: orange in focused window, grey_dark elsewhere.
+	hl(0, "GroupsAccentActive",   { fg = c.orange    })
+	hl(0, "GroupsAccentInactive", { fg = c.grey_dark })
+	-- WinSeparator override: step up to grey when focused, grey_dark when not.
+	hl(0, "GroupsWinSepActive",   { fg = c.grey      })
+	hl(0, "GroupsWinSepInactive", { fg = c.grey_dark })
 end
 
 return M

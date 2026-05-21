@@ -13,9 +13,9 @@
 local colors = {
 
 	-- ── Backgrounds ───────────────────────────────────────────────
-	bg = "#2B2A29", -- warm dark grey (main background)
-	bg_dark = "#232221", -- darker shade for floats, sidebars
-	bg_soft = "#353331", -- cursorline, subtle UI surfaces
+	bg = "#1B1A19", -- warm dark grey (main background)
+	bg_dark = "#131211", -- darker shade for floats, sidebars
+	bg_soft = "#232221", -- cursorline, subtle UI surfaces
 
 	-- ── Foregrounds / Text ────────────────────────────────────────
 	fg = "#F2F1EF", -- primary text

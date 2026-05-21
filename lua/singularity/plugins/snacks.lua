@@ -41,6 +41,7 @@ function M.setup()
 	hl(0, "SnackSecondary", { fg = c.grey_soft, bg = c.bg_dark })
 	hl(0, "SnackSelected", { fg = c.orange_80, bg = c.bg_soft, bold = true })
 	hl(0, "SnackHovered", { fg = c.orange_70, bg = c.bg_dark, bold = true })
+	hl(0, "SnacksPickerListCursorLine", { bg = c.bg_soft })
 	hl(0, "SnackRoot", { fg = c.orange, bold = true })
 
 	-- ── Dashboard ────────────────────────────────────────────────

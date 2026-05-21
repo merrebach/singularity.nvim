@@ -191,15 +191,21 @@ Singularity assigns a documented reason to every italic, bold, strikethrough, an
 
 Control flow (`if`, `for`, `return`) is plain orange — no italic.
 
-## Treesitter queries
+## Language support
 
-Singularity ships custom treesitter queries in `queries/` (with `; extends`) for TypeScript, Python, and TSX. These extend the base treesitter highlights without replacing them.
+All languages benefit from Singularity's treesitter highlight group assignments (the `@` capture groups). Some languages receive additional attention in the form of custom query files and/or dedicated semantic modules.
 
-Your own `after/queries/` take precedence — singularity's queries will not overwrite them.
+| Language | Custom queries | Semantic module | Notes |
+|---|---|---|---|
+| TypeScript | ✓ | ✓ | Builtins, type-only imports, `Array`/`Promise`/`console` |
+| TSX | ✓ | — | Shares TypeScript query overrides |
+| Python | ✓ | ✓ | Stdlib builtins → `@function.builtin` (italic/foreign axis) |
+| Rust | — | ✓ | Lifetime, attribute, macro captures |
+| All others | — | — | Base treesitter `@` captures apply — full color, no extra specificity |
 
-**What changes vs base treesitter?** The custom queries add captures for:
-- Python: builtins (`print`, `len`, `range`) → `@function.builtin` (italic/foreign axis)
-- TypeScript/TSX: `Array`, `Promise`, `console` members → `@variable.builtin`; type-only imports → `@type`
+**Custom queries** ship in `queries/<lang>/highlights.scm` with `; extends`, so they layer on top of nvim-treesitter's bundled queries. Your own `after/queries/` take precedence — singularity's queries will not overwrite them.
+
+**Semantic modules** are language-specific Lua files that set highlight groups beyond what treesitter captures (e.g. LSP semantic tokens, language-specific Vim syntax groups). Disable any module via `integrations = { python = false }` etc.
 
 ## Float surfaces
 
@@ -215,6 +221,32 @@ See `docs/adr/0002-float-ux.md` for the rationale.
 When `integrations.window_groups = true` (default), Singularity defines `GroupsActive`, `GroupsCurrent`, `GroupsInactive`, `GroupsSep`, and `GroupsFill` for [window-groups.nvim](https://github.com/merrebach/window-groups.nvim).
 
 This only takes effect if window-groups.nvim is installed. The integration is safe to leave enabled even if you don't use window-groups.
+
+## Plugin support
+
+Plugins below have dedicated highlight files — every relevant group is explicitly set. Plugins not in this list still render correctly via Neovim's standard UI groups (`Normal`, `FloatBorder`, `CursorLine`, etc.).
+
+| Plugin | Coverage |
+|---|---|
+| [snacks.nvim](https://github.com/folke/snacks.nvim) | Explorer, picker/list cursor, dashboard, notifications, activity bar |
+| [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) | Input, results, preview panes; borders, titles, selection |
+| [bufferline.nvim](https://github.com/akinsho/bufferline.nvim) | Tabs, buffers, active/inactive/fill states |
+| [nvim-cmp](https://github.com/hrsh7th/nvim-cmp) | All item kinds, match and fuzzy-match highlighting |
+| [lualine.nvim](https://github.com/nvim-lualine/lualine.nvim) | Mode segment colors |
+| [gitsigns.nvim](https://github.com/lewis6991/gitsigns.nvim) | Sign column add/change/delete, current-line blame |
+| [neo-tree.nvim](https://github.com/nvim-neo-tree/neo-tree.nvim) | Normal, NC, sign column |
+| [lazy.nvim](https://github.com/folke/lazy.nvim) | Plugin manager UI |
+| [mason.nvim](https://github.com/williamboman/mason.nvim) | Installer UI headers, blocks |
+| [lazygit.nvim](https://github.com/kdheepak/lazygit.nvim) | Float window and border |
+| [nvim-notify](https://github.com/rcarriga/nvim-notify) | All five severity levels (border, icon, title) |
+| [indent-blankline.nvim](https://github.com/lukas-reineke/indent-blankline.nvim) | Indent chars, scope, whitespace |
+| [rainbow-delimiters.nvim](https://github.com/HiPhish/rainbow-delimiters.nvim) | Bracket levels mapped to orange tints |
+| [trouble.nvim](https://github.com/folke/trouble.nvim) | Diagnostics list |
+| [which-key.nvim](https://github.com/folke/which-key.nvim) | Key popup, groups, separators |
+| [leap.nvim](https://github.com/ggandor/leap.nvim) | Jump labels (primary, secondary, backdrop) |
+| [todo-comments.nvim](https://github.com/folke/todo-comments.nvim) | NOTE, TODO, FIX, WARN, PERF, TEST badges |
+| [dashboard.nvim](https://github.com/nvimdev/dashboard-nvim) / [alpha.nvim](https://github.com/goolord/alpha-nvim) | Header, center, shortcut, footer |
+| [window-groups.nvim](https://github.com/merrebach/window-groups.nvim) | Winbar group indicators (gated by `integrations.window_groups`) |
 
 ## Edge cases
 
