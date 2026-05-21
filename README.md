@@ -9,8 +9,8 @@ A warm, italic-heavy dark colorscheme for Neovim. The palette descends from Ubun
 
 ## Installation
 
+**lazy.nvim** (recommended)
 ```lua
--- lazy.nvim
 {
   "merrebach/singularity.nvim",
   priority = 1000,
@@ -21,7 +21,35 @@ A warm, italic-heavy dark colorscheme for Neovim. The palette descends from Ubun
 }
 ```
 
+**packer.nvim**
+```lua
+use {
+  "merrebach/singularity.nvim",
+  config = function()
+    require("singularity").setup({})
+    vim.cmd("colorscheme singularity")
+  end,
+}
+```
+
+**mini.deps**
+```lua
+MiniDeps.add("merrebach/singularity.nvim")
+require("singularity").setup({})
+vim.cmd("colorscheme singularity")
+```
+
+**vim-plug**
+```vim
+Plug 'merrebach/singularity.nvim'
+" then in your init.lua or after plug#end():
+lua require("singularity").setup({})
+lua vim.cmd("colorscheme singularity")
+```
+
 ## Setup
+
+All options with their defaults:
 
 ```lua
 require("singularity").setup({
@@ -32,7 +60,6 @@ require("singularity").setup({
   bold = true,
 
   -- Surgical per-role overrides. Keys match color_semantic.lua role names.
-  -- Example: { func = { fg = "#FFFFFF" } }
   overrides = {},
 
   -- Opt out of specific language or integration modules.
@@ -46,6 +73,70 @@ require("singularity").setup({
   },
 })
 ```
+
+## Overrides
+
+Override any semantic role by name. Keys come from `color_semantic.lua`.
+
+**Change a single color:**
+```lua
+require("singularity").setup({
+  overrides = {
+    func = { fg = "#ffffff" },  -- make all function identifiers white
+  },
+})
+```
+
+**Force a style regardless of italic/bold toggles:**
+```lua
+require("singularity").setup({
+  overrides = {
+    keyword   = { fg = "#E95420", italic = false },  -- remove italic from keywords
+    type      = { fg = "#D4C5A9", bold = true },     -- force bold on types
+    parameter = { fg = "#828079", italic = true },   -- always italic, even if italic = false
+  },
+})
+```
+
+**Disable a role entirely (inherit default editor color):**
+```lua
+require("singularity").setup({
+  overrides = {
+    comment = { link = "Comment" },  -- link to the base Comment group
+  },
+})
+```
+
+## Toggles
+
+```lua
+-- No italic anywhere
+require("singularity").setup({ italic = false })
+
+-- No bold anywhere
+require("singularity").setup({ bold = false })
+
+-- Minimal: no italic, no bold
+require("singularity").setup({ italic = false, bold = false })
+```
+
+## Integrations
+
+Disable integrations you don't need:
+
+```lua
+require("singularity").setup({
+  integrations = {
+    treesitter    = false,  -- skip all @-prefixed treesitter highlight groups
+    rust          = false,  -- skip rust-specific groups
+    window_groups = false,  -- skip GroupsActive/Current/etc.
+  },
+})
+```
+
+**What happens without treesitter?** Syntax highlighting falls back to Vim's built-in regex highlighter. Colors still apply — the assignment is just less precise (e.g. `Function` instead of `@function`).
+
+**What happens without a language integration?** That language's semantic overrides are skipped. Base treesitter groups (`@function`, `@keyword`, etc.) still apply.
 
 ## Color hierarchy
 
@@ -75,7 +166,13 @@ Control flow (`if`, `for`, `return`) is plain orange — no italic.
 
 ## Treesitter queries
 
-Singularity ships custom treesitter queries in `queries/` (with `; extends`) for TypeScript, Python, and TSX. These extend the base treesitter highlights. Your own `after/queries/` take precedence.
+Singularity ships custom treesitter queries in `queries/` (with `; extends`) for TypeScript, Python, and TSX. These extend the base treesitter highlights without replacing them.
+
+Your own `after/queries/` take precedence — singularity's queries will not overwrite them.
+
+**What changes vs base treesitter?** The custom queries add captures for:
+- Python: builtins (`print`, `len`, `range`) → `@function.builtin` (italic/foreign axis)
+- TypeScript/TSX: `Array`, `Promise`, `console` members → `@variable.builtin`; type-only imports → `@type`
 
 ## Float surfaces
 
@@ -88,7 +185,17 @@ See `docs/adr/0002-float-ux.md` for the rationale.
 
 ## window-groups.nvim integration
 
-When `integrations.window_groups = true` (default), Singularity defines the `GroupsActive`, `GroupsCurrent`, `GroupsInactive`, `GroupsSep`, and `GroupsFill` highlight groups for [window-groups.nvim](https://github.com/merrebach/window-groups.nvim).
+When `integrations.window_groups = true` (default), Singularity defines `GroupsActive`, `GroupsCurrent`, `GroupsInactive`, `GroupsSep`, and `GroupsFill` for [window-groups.nvim](https://github.com/merrebach/window-groups.nvim).
+
+This only takes effect if window-groups.nvim is installed. The integration is safe to leave enabled even if you don't use window-groups.
+
+## Edge cases
+
+- **`:colorscheme singularity` before `setup()`** — the `colors/singularity.lua` entry point calls `load()` directly, which skips `setup()`. All options default to their values in `config.lua`. Call `setup()` before `:colorscheme singularity` to apply your configuration.
+- **Calling `setup()` multiple times** — each call overwrites the running config. The last `setup()` before `:colorscheme singularity` wins.
+- **`overrides` applies after all modules load.** Per-role overrides always win, regardless of what any integration sets.
+- **Disabling `treesitter` does not remove base `@` groups** that the runtime already set. It only skips singularity's assignments to those groups.
+- **`italic = false` in `setup()` vs `italic = false` in `overrides`** — the global toggle affects every role using the italic axes; an override for a specific role takes precedence and can re-enable italic on that role even when the global toggle is off.
 
 ## Extending
 
@@ -99,6 +206,16 @@ When `integrations.window_groups = true` (default), Singularity defines the `Gro
 ## Design
 
 See `CONTEXT.md` for the domain glossary and `docs/adr/` for architectural decisions.
+
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
+```sh
+make install-hooks   # install pre-commit lint hook
+make lint            # run luacheck
+make test            # run plenary tests (requires Neovim in PATH)
+```
 
 ## License
 
