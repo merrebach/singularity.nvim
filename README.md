@@ -59,6 +59,14 @@ require("singularity").setup({
   -- Toggle bold globally (affects definition-site axis only)
   bold = true,
 
+  -- Apply the palette background color to Normal and related groups.
+  -- Set to false to leave the background unset (inherits from the terminal).
+  background = true,
+
+  -- Force bg = "NONE" on Normal and gutter groups regardless of `background`.
+  -- Requires terminal-level transparency to be configured separately.
+  transparent = false,
+
   -- Surgical per-role overrides. Keys match color_semantic.lua role names.
   overrides = {},
 
@@ -106,6 +114,25 @@ require("singularity").setup({
   },
 })
 ```
+
+## Background
+
+**Opaque background (default)** — uses `#2B2A29` for `Normal`:
+```lua
+require("singularity").setup({ background = true })
+```
+
+**No background** — leaves `Normal.bg` unset; the terminal's own background color shows through:
+```lua
+require("singularity").setup({ background = false })
+```
+
+**Terminal transparency** — forces `bg = "NONE"` on `Normal`, `NormalNC`, `SignColumn`, `LineNr`, and related gutter groups. Requires your terminal emulator to have transparency configured:
+```lua
+require("singularity").setup({ transparent = true })
+```
+
+> `transparent = true` takes precedence over `background`. Both set to `false` and `transparent = true` produce the same result.
 
 ## Toggles
 

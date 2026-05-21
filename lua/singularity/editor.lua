@@ -8,17 +8,30 @@
 local M = {}
 
 function M.setup()
-	local c = require("singularity.colors")
-	local s = require("singularity.color_semantic")
-	local hl = vim.api.nvim_set_hl
+	local c   = require("singularity.colors")
+	local s   = require("singularity.color_semantic")
+	local cfg = require("singularity.config")
+	local hl  = vim.api.nvim_set_hl
 
 	-- ╔══════════════════════════════════════════════════════════════╗
 	-- ║                     CORE EDITOR                             ║
 	-- ╚══════════════════════════════════════════════════════════════╝
 
-	hl(0, "Normal", { fg = c.fg, bg = "NONE" })
-	hl(0, "NormalNC", { fg = c.grey, bg = "NONE" })
-	hl(0, "NormalSB", { fg = c.fg, bg = c.bg_dark })
+	local normal_bg, sidebar_bg
+	if cfg.transparent then
+		normal_bg  = "NONE"
+		sidebar_bg = "NONE"
+	elseif cfg.background then
+		normal_bg  = c.bg
+		sidebar_bg = c.bg_dark
+	else
+		normal_bg  = "NONE"
+		sidebar_bg = "NONE"
+	end
+
+	hl(0, "Normal",   { fg = c.fg,   bg = normal_bg })
+	hl(0, "NormalNC", { fg = c.grey, bg = normal_bg })
+	hl(0, "NormalSB", { fg = c.fg, bg = sidebar_bg })
 	-- Global floats: darker bg (rose-pine convention). All UI
 	-- floats (file explorer popups, Telescope, Lazy, Mason) use
 	-- these.
@@ -58,11 +71,12 @@ function M.setup()
 	hl(0, "EndOfBuffer", { fg = c.grey_dark })
 
 	-- Line numbers and signs
-	hl(0, "LineNr", { fg = c.grey_dark })
-	hl(0, "CursorLineNr", { fg = c.orange, bold = true })
-	hl(0, "SignColumn", { fg = c.grey_dark })
-	hl(0, "SignColumnSB", { fg = c.grey_dark, bg = c.bg_dark })
-	hl(0, "FoldColumn", { fg = c.grey })
+	local sign_bg = cfg.transparent and "NONE" or nil
+	hl(0, "LineNr",       { fg = c.grey_dark, bg = sign_bg })
+	hl(0, "CursorLineNr", { fg = c.orange,    bg = sign_bg, bold = true })
+	hl(0, "SignColumn",   { fg = c.grey_dark, bg = sign_bg })
+	hl(0, "SignColumnSB", { fg = c.grey_dark, bg = sidebar_bg })
+	hl(0, "FoldColumn",   { fg = c.grey,      bg = sign_bg })
 
 	-- Folding
 	hl(0, "Folded", { fg = c.grey, bg = c.bg_soft })

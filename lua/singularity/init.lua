@@ -40,8 +40,10 @@ function M.setup(opts)
 	opts = opts or {}
 	local cfg = require("singularity.config")
 
-	if opts.italic ~= nil then cfg.italic = opts.italic end
-	if opts.bold   ~= nil then cfg.bold   = opts.bold   end
+	if opts.italic      ~= nil then cfg.italic      = opts.italic      end
+	if opts.bold        ~= nil then cfg.bold        = opts.bold        end
+	if opts.background  ~= nil then cfg.background  = opts.background  end
+	if opts.transparent ~= nil then cfg.transparent = opts.transparent end
 
 	if opts.overrides then
 		cfg.overrides = vim.tbl_deep_extend("force", cfg.overrides, opts.overrides)
