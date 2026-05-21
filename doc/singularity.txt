@@ -1,18 +1,175 @@
-*singularity.txt*   Warm italic-heavy dark colorscheme for Neovim
-
-Generated from README.md by panvimdoc. Run CI or `panvimdoc` locally to rebuild.
-
-==============================================================================
-CONTENTS                                              *singularity-contents*
-
-  1. Requirements .......................... |singularity-requirements|
-  2. Installation .......................... |singularity-installation|
-  3. Setup ................................. |singularity-setup|
-  4. Color hierarchy ....................... |singularity-colors|
-  5. Style axes ............................ |singularity-axes|
-  6. Treesitter queries .................... |singularity-queries|
-  7. Float surfaces ........................ |singularity-floats|
-  8. Extending ............................. |singularity-extending|
+*singularity.txt*
+                              For Neovim >= 0.10.0    Last change: 2026 May 21
 
 ==============================================================================
-vim:tw=78:ts=8:ft=help:norl:
+Table of Contents                              *singularity-table-of-contents*
+
+1. singularity.nvim                             |singularity-singularity.nvim|
+  - Requirements                   |singularity-singularity.nvim-requirements|
+  - Installation                   |singularity-singularity.nvim-installation|
+  - Setup                                 |singularity-singularity.nvim-setup|
+  - Color hierarchy             |singularity-singularity.nvim-color-hierarchy|
+  - Style axes                       |singularity-singularity.nvim-style-axes|
+  - Treesitter queries       |singularity-singularity.nvim-treesitter-queries|
+  - Float surfaces               |singularity-singularity.nvim-float-surfaces|
+  - window-groups.nvim integration|singularity-singularity.nvim-window-groups.nvim-integration|
+  - Extending                         |singularity-singularity.nvim-extending|
+  - Design                               |singularity-singularity.nvim-design|
+  - License                             |singularity-singularity.nvim-license|
+
+==============================================================================
+1. singularity.nvim                             *singularity-singularity.nvim*
+
+A warm, italic-heavy dark colorscheme for Neovim. The palette descends from
+Ubuntu’s signature orange (`#E95420`) — that hue is the primary accent —
+while the aesthetic leans toward rose-pine / catppuccin: more italic, lighter
+use of bold, and **explicit style axes** that document why each token is styled
+the way it is.
+
+
+REQUIREMENTS                       *singularity-singularity.nvim-requirements*
+
+- Neovim >= 0.10
+- Optional but recommended: nvim-treesitter <https://github.com/nvim-treesitter/nvim-treesitter> for language-aware highlighting
+
+
+INSTALLATION                       *singularity-singularity.nvim-installation*
+
+>lua
+    -- lazy.nvim
+    {
+      "merrebach/singularity.nvim",
+      priority = 1000,
+      config = function()
+        require("singularity").setup({})
+        vim.cmd("colorscheme singularity")
+      end,
+    }
+<
+
+
+SETUP                                     *singularity-singularity.nvim-setup*
+
+>lua
+    require("singularity").setup({
+      -- Toggle italic globally (affects foreign, declaration, organizational axes)
+      italic = true,
+    
+      -- Toggle bold globally (affects definition-site axis only)
+      bold = true,
+    
+      -- Surgical per-role overrides. Keys match color_semantic.lua role names.
+      -- Example: { func = { fg = "#FFFFFF" } }
+      overrides = {},
+    
+      -- Opt out of specific language or integration modules.
+      integrations = {
+        treesitter    = true,
+        lsp           = true,
+        python        = true,
+        typescript    = true,
+        rust          = true,
+        window_groups = true,  -- GroupsActive/Current/Inactive/Sep/Fill for window-groups.nvim
+      },
+    })
+<
+
+
+COLOR HIERARCHY                 *singularity-singularity.nvim-color-hierarchy*
+
+  -----------------------------------------------------------------------
+  Color                               Role
+  ----------------------------------- -----------------------------------
+  Orange #E95420                      Control-flow keywords, booleans
+                                      (orange_80), constants, UI accents
+
+  Warm sand #D8B08A                   Functions, methods, callable
+                                      identifiers
+
+  Cream #D4C5A9                       Types, classes, interfaces,
+                                      decorators
+
+  Grass green #52931C                 Strings
+
+  Slate grey #828079                  Modules, namespaces, parameters,
+                                      type builtins — italic
+
+  Warm greys                          Text, comments, subtle UI chrome
+  -----------------------------------------------------------------------
+
+STYLE AXES                           *singularity-singularity.nvim-style-axes*
+
+Singularity assigns a documented reason to every italic, bold, strikethrough,
+and underline. See `CONTEXT.md` for the full glossary.
+
+  -----------------------------------------------------------------------
+  Style                   Axis                    Token classes
+  ----------------------- ----------------------- -----------------------
+  italic                  Foreign                 Identifiers from stdlib
+                                                  / builtins (os, print,
+                                                  Array.from)
+
+  italic                  Declaration             Keywords that introduce
+                                                  a binding (def, class,
+                                                  import, let, const,
+                                                  type)
+
+  italic                  Organizational          Modules, parameters,
+                                                  comments, doc strings,
+                                                  markup quotes
+
+  bold                    Definition Site         type_definition,
+                                                  constructor only
+
+  strikethrough           Deprecated              Any role
+
+  underline               Readonly / URL          Any role
+  -----------------------------------------------------------------------
+Control flow (`if`, `for`, `return`) is plain orange — no italic.
+
+
+TREESITTER QUERIES           *singularity-singularity.nvim-treesitter-queries*
+
+Singularity ships custom treesitter queries in `queries/` (with `; extends`)
+for TypeScript, Python, and TSX. These extend the base treesitter highlights.
+Your own `after/queries/` take precedence.
+
+
+FLOAT SURFACES                   *singularity-singularity.nvim-float-surfaces*
+
+Two distinct surfaces:
+
+- **Global** (`NormalFloat` / `FloatBorder`) — `bg_dark` + orange rounded border. File explorer, Telescope, Lazy, Mason, diagnostic floats.
+- **Hover** (`LspHoverNormal` / `LspHoverBorder`) — `bg_soft` + orange rounded border. Applied via `winhighlight` on the hover window only.
+
+See `docs/adr/0002-float-ux.md` for the rationale.
+
+
+WINDOW-GROUPS.NVIM INTEGRATION*singularity-singularity.nvim-window-groups.nvim-integration*
+
+When `integrations.window_groups = true` (default), Singularity defines the
+`GroupsActive`, `GroupsCurrent`, `GroupsInactive`, `GroupsSep`, and
+`GroupsFill` highlight groups for window-groups.nvim
+<https://github.com/merrebach/window-groups.nvim>.
+
+
+EXTENDING                             *singularity-singularity.nvim-extending*
+
+- **New language:** copy an existing language file, reference `color_semantic` roles only.
+- **New role:** add to `color_semantic.lua` and compose via `style_rules` so the axis stays documented.
+- **New style axis:** update `style_rules.lua` + `ADR-0001-style-axes.md` before adding call sites.
+
+
+DESIGN                                   *singularity-singularity.nvim-design*
+
+See `CONTEXT.md` for the domain glossary and `docs/adr/` for architectural
+decisions.
+
+
+LICENSE                                 *singularity-singularity.nvim-license*
+
+MIT — see LICENSE <LICENSE>.
+
+Generated by panvimdoc <https://github.com/kdheepak/panvimdoc>
+
+vim:tw=78:ts=8:noet:ft=help:norl:
