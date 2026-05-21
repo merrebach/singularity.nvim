@@ -14,9 +14,10 @@ Table of Contents                              *singularity-table-of-contents*
   - Integrations                   |singularity-singularity.nvim-integrations|
   - Color hierarchy             |singularity-singularity.nvim-color-hierarchy|
   - Style axes                       |singularity-singularity.nvim-style-axes|
-  - Treesitter queries       |singularity-singularity.nvim-treesitter-queries|
+  - Language support           |singularity-singularity.nvim-language-support|
   - Float surfaces               |singularity-singularity.nvim-float-surfaces|
   - window-groups.nvim integration|singularity-singularity.nvim-window-groups.nvim-integration|
+  - Plugin support               |singularity-singularity.nvim-plugin-support|
   - Edge cases                       |singularity-singularity.nvim-edge-cases|
   - Extending                         |singularity-singularity.nvim-extending|
   - Design                               |singularity-singularity.nvim-design|
@@ -274,19 +275,43 @@ and underline. See `CONTEXT.md` for the full glossary.
 Control flow (`if`, `for`, `return`) is plain orange — no italic.
 
 
-TREESITTER QUERIES           *singularity-singularity.nvim-treesitter-queries*
+LANGUAGE SUPPORT               *singularity-singularity.nvim-language-support*
 
-Singularity ships custom treesitter queries in `queries/` (with `; extends`)
-for TypeScript, Python, and TSX. These extend the base treesitter highlights
-without replacing them.
+All languages benefit from Singularity’s treesitter highlight group
+assignments (the `@` capture groups). Some languages receive additional
+attention in the form of custom query files and/or dedicated semantic modules.
 
-Your own `after/queries/` take precedence — singularity’s queries will not
-overwrite them.
+  -----------------------------------------------------------------------------
+  Language          Custom queries    Semantic module   Notes
+  ----------------- ----------------- ----------------- -----------------------
+  TypeScript                                            Builtins,type-only
+                                                        imports,
+                                                        Array/Promise/console
 
-**What changes vs base treesitter?** The custom queries add captures for: -
-Python: builtins (`print`, `len`, `range`) → `@function.builtin`
-(italic/foreign axis) - TypeScript/TSX: `Array`, `Promise`, `console` members
-→ `@variable.builtin`; type-only imports → `@type`
+  TSX                                 —                 SharesTypeScript query
+                                                        overrides
+
+  Python                                                Stdlibbuiltins →
+                                                        @function.builtin
+                                                        (italic/foreign axis)
+
+  Rust              —                                   Lifetime,attribute,
+                                                        macro captures
+
+  All others        —                 —                 Base treesitter @
+                                                        captures apply — full
+                                                        color, no extra
+                                                        specificity
+  -----------------------------------------------------------------------------
+**Custom queries** ship in `queries/<lang>/highlights.scm` with `; extends`, so
+they layer on top of nvim-treesitter’s bundled queries. Your own
+`after/queries/` take precedence — singularity’s queries will not overwrite
+them.
+
+**Semantic modules** are language-specific Lua files that set highlight groups
+beyond what treesitter captures (e.g. LSP semantic tokens, language-specific
+Vim syntax groups). Disable any module via `integrations = { python = false }`
+etc.
 
 
 FLOAT SURFACES                   *singularity-singularity.nvim-float-surfaces*
@@ -309,6 +334,65 @@ When `integrations.window_groups = true` (default), Singularity defines
 This only takes effect if window-groups.nvim is installed. The integration is
 safe to leave enabled even if you don’t use window-groups.
 
+
+PLUGIN SUPPORT                   *singularity-singularity.nvim-plugin-support*
+
+Plugins below have dedicated highlight files — every relevant group is
+explicitly set. Plugins not in this list still render correctly via Neovim’s
+standard UI groups (`Normal`, `FloatBorder`, `CursorLine`, etc.).
+
+  -----------------------------------------------------------------------
+  Plugin                              Coverage
+  ----------------------------------- -----------------------------------
+  snacks.nvim                         Explorer, picker/list cursor,
+                                      dashboard, notifications, activity
+                                      bar
+
+  telescope.nvim                      Input, results, preview panes;
+                                      borders, titles, selection
+
+  bufferline.nvim                     Tabs, buffers, active/inactive/fill
+                                      states
+
+  nvim-cmp                            All item kinds, match and
+                                      fuzzy-match highlighting
+
+  lualine.nvim                        Mode segment colors
+
+  gitsigns.nvim                       Sign column add/change/delete,
+                                      current-line blame
+
+  neo-tree.nvim                       Normal, NC, sign column
+
+  lazy.nvim                           Plugin manager UI
+
+  mason.nvim                          Installer UI headers, blocks
+
+  lazygit.nvim                        Float window and border
+
+  nvim-notify                         All five severity levels (border,
+                                      icon, title)
+
+  indent-blankline.nvim               Indent chars, scope, whitespace
+
+  rainbow-delimiters.nvim             Bracket levels mapped to orange
+                                      tints
+
+  trouble.nvim                        Diagnostics list
+
+  which-key.nvim                      Key popup, groups, separators
+
+  leap.nvim                           Jump labels (primary, secondary,
+                                      backdrop)
+
+  todo-comments.nvim                  NOTE, TODO, FIX, WARN, PERF, TEST
+                                      badges
+
+  dashboard.nvim / alpha.nvim         Header, center, shortcut, footer
+
+  window-groups.nvim                  Winbar group indicators (gated by
+                                      integrations.window_groups)
+  -----------------------------------------------------------------------
 
 EDGE CASES                           *singularity-singularity.nvim-edge-cases*
 
