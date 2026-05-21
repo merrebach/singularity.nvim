@@ -1,0 +1,18 @@
+*singularity.txt*   Warm italic-heavy dark colorscheme for Neovim
+
+Generated from README.md by panvimdoc. Run CI or `panvimdoc` locally to rebuild.
+
+==============================================================================
+CONTENTS                                              *singularity-contents*
+
+  1. Requirements .......................... |singularity-requirements|
+  2. Installation .......................... |singularity-installation|
+  3. Setup ................................. |singularity-setup|
+  4. Color hierarchy ....................... |singularity-colors|
+  5. Style axes ............................ |singularity-axes|
+  6. Treesitter queries .................... |singularity-queries|
+  7. Float surfaces ........................ |singularity-floats|
+  8. Extending ............................. |singularity-extending|
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
